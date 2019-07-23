@@ -28,12 +28,14 @@ for trial = trials
         %% Terminal Link reward
         disp("Show terminal link");
         showStimuli(rewardImage, 2);
-        pause(stimulusDuration);
+        keyOut = keyBuffer(stimulusDuration);
+        disp(keyOut);
         disp("food, yummi");
     else
         %% Terminal Link non reward
         disp("Show terminal link on reward");
         showStimuli(nonRewardImage, 2);
+        keyOut = keyBuffer(stimulusDuration);
     end
    
     i = i + 1;

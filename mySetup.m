@@ -26,8 +26,8 @@ function mySetup
 
 % VERSION HISTORY:
 % Author:         Tobias Otto, Jonas Rose
-% Version:        0.5
-% Last Change:    20.04.2010
+% Version:        1.2
+% Last Change:    24.10.2016
 %
 % 17.04.2008: Tobias: release Version
 % 24.04.2008: Tobias: added Touchscreen support
@@ -38,6 +38,9 @@ function mySetup
 % 11.02.2009: Tobias: added entry for manual shaping
 % 07.02.2010: Jonas: Changed header look
 % 20.04.2010: Tobias: added warrior box as new io device
+% 04.02.2016, Tobias: added feeder power due to new feeder
+% 02.03.2016, Tobias: added Network IO box
+% 24.10.2016, Tobias: added NetworkBoxMatlab as option for the network toolbox (for experts only)
 
 %% BUGS/ TODO
 % - publish in nature
@@ -49,7 +52,7 @@ global SETUP
 
 %% (1) Please enter path to the BiopsyToolbox folder
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-SETUP.toolboxPath = 'D:\Dokumente\MATLAB\ToolboxB234';
+SETUP.toolboxPath = 'D:\Dokumente\MATLAB\BiopsyToolbox2016F';
 
 %% (2) Please choose the IO device
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -57,13 +60,18 @@ SETUP.toolboxPath = 'D:\Dokumente\MATLAB\ToolboxB234';
 % IO-Warrior 40 and a self made parallel port Interface. Please choose the
 % interface you want to use.
 % For training purposes the keyboard can be used as well.
-% 'iowarrior'   -> Grants access to the IO-Warrior 40
-% 'parallel'    -> Grants access to the self made parallel port interface
-% 'warriorbox'  -> Grants access to the self made IO-Warrior interface
-% 'fbiscience'  -> Grants access to the FBI-Science IO device
-% 'keyboard'    -> For testing your program in your office using the keyboard
+% 'IOWarrior'   -> Grants access to the IO-Warrior 40
+% 'Parallel'    -> Grants access to the self made parallel port interface
+% 'WarriorBox'  -> Grants access to the self made IO-Warrior interface
+% 'FBIScience'  -> Grants access to the FBI-Science IO device
+% 'NetworkBox'  -> Grants access to the Odroid network IO device
+% 'Keyboard'    -> For testing your program in your office using the keyboard
 
 SETUP.io.interface = 'keyboard';
+
+% Add IP address of NetworkBox as string here. E.g. '192.168.0.1' 
+% Otherwise leave this field empty!
+SETUP.networkDIO.odroidIP   = '192.168.0.12';
 
 %% (3) Please specify the OUTPUT devices
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -73,6 +81,7 @@ SETUP.io.interface = 'keyboard';
 SETUP.io.houseLight  = 1;
 SETUP.io.feeder      = 2;
 SETUP.io.feederLight = [];
+SETUP.io.feederPower = [];
 SETUP.io.punishment  = [];
 % Add custom outputs here
 

@@ -6,7 +6,7 @@ exp.certainGroup = [1 2];
 %% Misc
 exp.pretraining.itiMin = 1; % 20
 exp.pretraining.itiMax = 1; % 80
-exp.pretraining.stimulusDuration = 0.1; % 2
+exp.pretraining.stimulusDuration = 2; % 2
 exp.pretraining.rewardColor = loadImage(['stimuli/' 'red.jpg']);
 exp.pretraining.nonRewardColor = loadImage(['stimuli/' 'white.jpg']);
 

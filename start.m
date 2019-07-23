@@ -10,7 +10,7 @@
 %
 % EXAMPLES
 %
-% Copyright 2007-2012
+% Copyright 2007-2016
 % CC-GNU GPL by attribution
 % Please cite the BioPsychology Toolbox where this function is used.
 %       http://biopsytoolbox.sourceforge.net/
@@ -19,8 +19,8 @@
 
 % VERSION HISTORY:
 % Author:  		Tobias Otto, Jonas Rose
-% Version: 		2.1
-% Last Change:  21.05.2012
+% Version: 		2.4
+% Last Change:  24.10.2016
 
 % 31.03.08, Tobias: Release version
 % 03.04.08, Tobias: added otherwise in switch case statement
@@ -31,25 +31,24 @@
 % 10.06.08, Tobias: added support for FBI-Science IO interface
 % 12.06.08, Tobias: added toolbox info
 % 13.06.08, Tobias: more error handling
-% 01.07.08, Tobias: added FBI-Science interface completely. Removed other
-%                   interfaces from path (minor bugfix due to use with SVN
-%                   files). Cosmetics
+% 01.07.08, Tobias: added FBI-Science interface completely. Removed other interfaces from path (minor bugfix due to use with SVN files). Cosmetics
 % 23.07.08, Tobias: Deleted variable k in the end -> cosmetics
 % 11.02.09, Tobias: Added timer for manual shaping
-% 08.07.09, Tobias: Added backwardscompatibility for old mysetup.m files
-%                   (manual shaping entry in SETUP struct)
-% 01.10.09, Tobias: struct entry for new startStopDevice function,
-%                   cosmetics
+% 08.07.09, Tobias: Added backwardscompatibility for old mysetup.m files (manual shaping entry in SETUP struct)
+% 01.10.09, Tobias: struct entry for new startStopDevice function, cosmetics
 % 31.10.10, Tobias: Changed date dialog
 % 22.02.10, Tobias: Changed code and seed for different MATLAB versions
-% 28.02.10, Tobias: Cosmetics (deleted variables), added backwards
-%                   compatibility for background color entry in SETUP
+% 28.02.10, Tobias: Cosmetics (deleted variables), added backwards compatibility for background color entry in SETUP
 % 20.04.10, Tobias: Added new io device WarriorBox
 % 21.04.10, Tobias: Added new cmex function for parallel port device
 % 22.12.11, Tobias: cosmetics
-% 21.05.12, Tobias: added RandStream.setGlobalStream for MATLAB versions
-%                   newer than 2011
+% 21.05.12, Tobias: added RandStream.setGlobalStream for MATLAB versions newer than 2011
+% 04.02.2016, Tobias: added check for feeder power option
+% 02.03.2016, Tobias: added network IO device and new random function
+% 15.07.2016, Tobias: don't copy pnet to current directory (not needed),  more checks for 64 and 32 bit
+% 24.10.2016, Tobias: added new network device (based on the instrument controll toolbox)
 
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DO NOT edit enything beyond this line
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -57,6 +56,7 @@ year = datestr(now,'yyyy');
 clc
 disp(' ================================================================');
 disp('  The BioPsychology Toolbox - A free, open source Matlab Toolbox ');
+disp('                      --- 32 and 64 bit --- ');
 disp(' ================================================================');
 disp('         Developed at the Ruhr University in Bochum, ');
 disp('             Institute of Cognitive Neuroscience');
@@ -73,22 +73,22 @@ disp('Initializing ...');
 %% Add global variables
 global SETUP
 global WINDOW
-WINDOW=[];
-on = 1;
-off = 0;
+WINDOW  = [];
+on      = 1;
+off     = 0;
 
 %% Set new state for rand !!!
 % Check MATLAB version
-tmp                         = version('-release');
-tmp(~ismember(tmp,'0':'9')) = [];
-tmp                         = str2double(tmp);
+tmp     = version('-release');
+tmp1    = tmp(end);
+tmp2    = str2double(tmp(1:end-1));
 
-if(tmp <= 2008)
-    rand('state',sum(100*clock));
-elseif(tmp > 2008 && tmp <2012)
-    RandStream.setDefaultStream(RandStream('mt19937ar','seed',sum(100*clock)));
-else
+if(tmp2 < 2012 || strcmpi('2012a', tmp))
+    error('This MATLAB version is too old. Please update at least to MATLAB 2012b');
+elseif(tmp2 >= 2012 && tmp2 < 2015)
     RandStream.setGlobalStream(RandStream('mt19937ar','Seed',sum(100*clock)));
+elseif(tmp2 >= 2015)
+    rng('shuffle');
 end
 
 % Necessary for subfunctions ... since they use toc
@@ -130,6 +130,19 @@ if(~isfield(SETUP.screen,'bgColor'))
     disp(' See the manual for help');
     disp(' ================================================================');
     SETUP.screen.bgColor = 'k';
+end
+
+% Check for the feeder power option
+% Do we have a background color entry
+if(~isfield(SETUP.io,'feederPower'))
+    disp(' ================================================================');
+    disp(' --> Adding entry for feederPower to SETUP struct.');
+    disp(' This message appears, because you are using an old mysetup.m file.');
+    disp(' You don''t have to change anything until you want to use');
+    disp(' a feeder that needs an external power supply. ');
+    disp(' See the manual for help');
+    disp(' ================================================================');
+    SETUP.io.feederPower = [];
 end
 
 %% Check inputs in mySetup
@@ -189,6 +202,10 @@ switch lower(SETUP.io.interface)
         interface = 4;
     case 'warriorbox'
         interface = 5;
+    case 'networkbox'
+        interface = 7;
+    case 'networkboxmatlab'
+        interface = 8;
     otherwise
         disp(' ================================================================');
         disp(' Check entries in mySetup.m! ');
@@ -199,7 +216,7 @@ switch lower(SETUP.io.interface)
 end
 
 %% Remove needless path entries to interface dlls
-needless = 1:5;
+needless = 1:7;
 needless(needless==interface) = [];
 
 for i=1:length(needless)
@@ -222,34 +239,59 @@ end
 addpath(bioPath);
 
 %% Copy necessary dlls into working directory
+% Check for Windows version, because some devices only work with 32 bit
+% Windows and MATLAB
+pc = computer('arch');
+pc = str2double(pc(end-1:end));
+
 if(interface ~= 3)
     curDir = cd;
     switch interface
         case 1
-            if(isempty(dir('iowkit.dll')))
-                copyfile([SETUP.toolboxPath '\IO\Interface' num2str(interface) ...
-                    '\iowkit.dll'] , curDir);
-                disp('Copied iowkit.dll (IO-WARRIOR 40) into the current working directory');
+            if(pc == 32)
+                if(isempty(dir('iowkit.dll')))
+                    copyfile([SETUP.toolboxPath '\IO\Interface' num2str(interface) '\iowkit.dll'] , curDir);
+                    disp('Copied iowkit.dll (IO-WARRIOR 40) into the current working directory');
+                end
+            else
+                disp('-------------------------------------------------------------------');
+                disp(' The IO Warrior 40 is only supported on Windows 32 bit platforms');
+                disp('  Please choose another IO interface');
+                disp('-------------------------------------------------------------------');
+                error('  I give up! Please solve problem and try again!');
             end
         case 2
-            if(isempty(dir('porttalk.sys')))
-                copyfile([SETUP.toolboxPath '\IO\Interface' num2str(interface) ...
-                    '\porttalk.sys'] , curDir);
-                disp('Copied porttalk.sys (PortTalk device driver) into the current working directory');
-                disp('See http://www.beyondlogic.org/porttalk/porttalk.htm for more details.'); 
+            if(pc == 32 && isempty(dir('inpout32.dll')))
+                copyfile([SETUP.toolboxPath '\IO\Interface' num2str(interface) '\inpout32.dll'] , curDir);
+                disp('Copied inpout32.dll (InpOut32Drv Driver Interface DLL) into the current working directory');
+            elseif(pc == 64 && isempty(dir('inpoutx64.dll')))
+                copyfile([SETUP.toolboxPath '\IO\Interface' num2str(interface) '\inpoutx64.dll'] , curDir);
+                disp('Copied inpoutx64.dll (InpOut32Drv Driver Interface DLL) into the current working directory');
             end
+            disp('See http://www.highrez.co.uk/Downloads/InpOut32 or the Highrez Forums (http://forums.highrez.co.uk) for information.');
         case 4
-            if(isempty(dir('iowkit.dll')))
-                copyfile([SETUP.toolboxPath '\IO\Interface' num2str(interface) ...
-                    '\iowkit.dll'] , curDir);
-                disp('Copied iowkit.dll (FBI-Science) into the current working directory');
-            end
+            disp('---------------------------------------------------------');
+            disp('  The FBI Science interface isn''t supported anymore!')
+            disp('  Please choose another IO interface');
+            disp('---------------------------------------------------------');
+            error('  I give up! Please solve problem and try again!');
         case 5
-            if(isempty(dir('iowkit.dll')))
-                copyfile([SETUP.toolboxPath '\IO\Interface' num2str(interface) ...
-                    '\iowkit.dll'] , curDir);
-                disp('Copied iowkit.dll (WARRIOR-IO-BOX) into the current working directory');
+            if(pc == 32)
+                if(isempty(dir('iowkit.dll')))
+                    copyfile([SETUP.toolboxPath '\IO\Interface' num2str(interface) '\iowkit.dll'] , curDir);
+                    disp('Copied iowkit.dll (WARRIOR-IO-BOX) into the current working directory');
+                end
+            else
+                disp('-------------------------------------------------------------------');
+                disp(' The IO Warrior Box is only supported on Windows 32 bit platforms');
+                disp('  Please choose another IO interface');
+                disp('-------------------------------------------------------------------');
+                error('  I give up! Please solve problem and try again!');
             end
+        case 7
+            SETUP.networkDIO.initDone   = 0;
+        case 8
+            SETUP.networkDIO.initDone   = 0;
     end
 end
 
@@ -305,7 +347,7 @@ SETUP.startStop.startStopTimerIndex    = zeros(1,32);
 
 %% Clear needless variables
 clear names counter bioPath i j needless pos startPos interface curDir len
-clear tmp k ans year
+clear tmp k ans year tmp2 tmp1 pc
 
 %% Done
 disp('                 ... done');
