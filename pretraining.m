@@ -1,5 +1,5 @@
 %% Input variables
-pigeonNumber = 3;
+pigeonNumber = 1;
 sessionNumber = 1;
 
 %% Init toolbox
@@ -24,9 +24,11 @@ end
 
 if sessionNumber <= 8
     % pre 1
-    pretrainingPhase1(exp.pretraining.phase1Trials, exp.pretraining.itiMin,...
+    result = pretrainingPhase1(exp.pretraining.phase1Trials, exp.pretraining.itiMin,...
         exp.pretraining.itiMax, exp.pretraining.stimulusDuration,...
         exp.pretraining.rewardColor, exp.pretraining.nonRewardColor, certainGroup);
+    
+    save2File(result);
 else
     % pre 2
 end
