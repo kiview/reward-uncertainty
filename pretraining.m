@@ -1,6 +1,6 @@
 %% Input variables
 pigeonNumber = 1;
-sessionNumber = 1;
+sessionNumber = 9;
 
 %% Init toolbox
 start;
@@ -31,6 +31,11 @@ if sessionNumber <= 8
     save2File(result);
 else
     % pre 2
+    result = pretrainingPhase2(exp.pretraining.phase2Trials, exp.pretraining.itiMin,...
+        exp.pretraining.itiMax, exp.pretraining.initialDuration,...
+        exp.pretraining.initialStimulus1, exp.pretraining.initialStimulus2,...
+        exp.pretraining.terminalDuration, exp.pretraining.terminalStimulus1, exp.pretraining.terminalStimulus2, certainGroup);
+    save2File(result);
 end
 
 

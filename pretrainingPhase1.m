@@ -35,6 +35,8 @@ for trial = trials
         keyOut = keyBuffer(stimulusDuration);
         out(i).rewarded = 0;
     end
+    % TODO: use calculateResponses()
+    
     out(i).respPerTrial = size(keyOut.raw, 1);
     
     %% calc resp/s for each s
