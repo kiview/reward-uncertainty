@@ -1,6 +1,8 @@
 function out = pretrainingPhase2(numTrials, minIti, maxIti, inititalDuration, ...
     initialStimulus1, initialStimulus2, terminalDuration, terminalStimulus1, ...
-    terminalStimulus2, certaintyGroup)
+    terminalStimulus2, certaintyGroup, ratio, initialDuration2, firstGroup)
+
+experimentalConditions;
 
 %% Trial mapping
 % 1 -> i1 t1
@@ -11,8 +13,10 @@ function out = pretrainingPhase2(numTrials, minIti, maxIti, inititalDuration, ..
 if certaintyGroup
     trials = randomOrder(2, numTrials * 2);
 else
-    trials = randomOrder(4, numTrials * 4);
+    trials = randomOrder(4, numTrials * 4, 'ratio', ratio);
 end
+
+out.trials = trials;
 
 i = 1;
 for trial = trials
@@ -29,12 +33,28 @@ for trial = trials
     %% TL
     switch trial
         case 1
+            if inititalDuration2 && firstGroup
+                inititalDuration = inititalDuration2;
+            end
+            
             out(i).response = performInitialTerminalStimulusTrial(inititalDuration, initialStimulus1, terminalDuration, terminalStimulus1, 1);
         case 2
+            if inititalDuration2 && ~firstGroup
+                inititalDuration = inititalDuration2;
+            end
+            
             out(i).response = performInitialTerminalStimulusTrial(inititalDuration, initialStimulus2, terminalDuration, terminalStimulus1, 1);
         case 3
+            if inititalDuration2 && firstGroup
+                inititalDuration = inititalDuration2;
+            end
+            
             out(i).response = performInitialTerminalStimulusTrial(inititalDuration, initialStimulus1, terminalDuration, terminalStimulus2, 0);
         case 4
+            if inititalDuration2 && ~firstGroup
+                inititalDuration = inititalDuration2;
+            end
+            
             out(i).response = performInitialTerminalStimulusTrial(inititalDuration, initialStimulus2, terminalDuration, terminalStimulus2, 0);
     end
             
@@ -55,7 +75,7 @@ function out = performInitialTerminalStimulusTrial(inititalDuration, initialImag
     out.terminal = calculateResponses(out.terminal);
     
     if rewarded
-        disp("food, yummi"); % TODO: real food plz
+        feeding(exp.feedingTime);
         out.rewarded = 1;
     else
         out.rewarded = 0;

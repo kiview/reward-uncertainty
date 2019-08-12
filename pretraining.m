@@ -1,6 +1,9 @@
 %% Input variables
-pigeonNumber = 1;
-sessionNumber = 9;
+pStr = inputdlg("Pigeon number");
+pigeonNumber = str2num(pStr{1});
+
+sStr = inputdlg("Session number");
+sessionNumber = str2num(sStr{1});
 
 %% Init toolbox
 start;
@@ -12,6 +15,7 @@ initWindow(2);
 %% Start session
 certainGroup = ismember(pigeonNumber, exp.certainGroup);
 uncertainGroup = ismember(pigeonNumber, exp.uncertainGroup);
+firstHalf = ismember(pigeonNumber, exp.uncertainGroupFirstHalf) || ismember(pigeonNumber, exp.certainGroupFirstHalf);
 
 if certainGroup
     fprintf("Pigeon %i is in certain group\n", pigeonNumber);
@@ -34,14 +38,25 @@ elseif sessionNumber <= 12
     result = pretrainingPhase2(exp.pretraining.phase2Trials, exp.pretraining.itiMin,...
         exp.pretraining.itiMax, exp.pretraining.initialDuration,...
         exp.pretraining.initialStimulus1, exp.pretraining.initialStimulus2,...
-        exp.pretraining.terminalDuration, exp.pretraining.terminalStimulus1, exp.pretraining.terminalStimulus2, certainGroup);
+        exp.pretraining.terminalDuration, exp.pretraining.terminalStimulus1, exp.pretraining.terminalStimulus2,...
+        certainGroup, [1], 0, 0);
     save2File(result);
 elseif sessionNumber <= 24
     % training 1
-    
+    result = pretrainingPhase2(exp.training.phase1Trials, exp.pretraining.itiMin,...
+        exp.pretraining.itiMax, exp.training.initialDuration,...
+        exp.pretraining.initialStimulus1, exp.pretraining.initialStimulus2,...
+        exp.training.terminalDuration, exp.pretraining.terminalStimulus1, exp.pretraining.terminalStimulus2,...
+        certainGroup, [0.125 0.125 0.375 0.375], 0, 0);
+    save2File(result);
 else
     % training 2
-    
+    result = pretrainingPhase2(exp.training.phase1Trials, exp.pretraining.itiMin,...
+        exp.pretraining.itiMax, exp.training.initialDuration,...
+        exp.pretraining.initialStimulus1, exp.pretraining.initialStimulus2,...
+        exp.training.terminalDuration, exp.pretraining.terminalStimulus1, exp.pretraining.terminalStimulus2,...
+        certainGroup, [0.125 0.125 0.375 0.375], exp.training.initialDurationLong, firstHalf);
+    save2File(result);
 end
 
 

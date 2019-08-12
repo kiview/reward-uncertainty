@@ -1,4 +1,5 @@
 function out = pretrainingPhase1(numTrials, minIti, maxIti, stimulusDuration, rewardImage, nonRewardImage, certaintyGroup)
+experimentalConditions;
 
 if certaintyGroup
     trials = ones(1, numTrials);
@@ -25,7 +26,7 @@ for trial = trials
         showStimuli(rewardImage, 2);
         out(i).cs = rewardImage;
         keyOut = keyBuffer(stimulusDuration);
-        disp("food, yummi"); % TODO: real food plz
+        feeding(exp.feedingTime);
         out(i).rewarded = 1;
     else
         %% Terminal Link non reward
