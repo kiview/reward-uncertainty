@@ -31,7 +31,11 @@ for trial = trials
         case 1
             out(i).response = performInitialTerminalStimulusTrial(inititalDuration, initialStimulus1, terminalDuration, terminalStimulus1, 1);
         case 2
-            out(i).response = performInitialTerminalStimulusTrial(inititalDuration, initialStimulus2, terminalDuration, terminalStimulus2, 1);
+            out(i).response = performInitialTerminalStimulusTrial(inititalDuration, initialStimulus2, terminalDuration, terminalStimulus1, 1);
+        case 3
+            out(i).response = performInitialTerminalStimulusTrial(inititalDuration, initialStimulus1, terminalDuration, terminalStimulus2, 0);
+        case 4
+            out(i).response = performInitialTerminalStimulusTrial(inititalDuration, initialStimulus2, terminalDuration, terminalStimulus2, 0);
     end
             
     i = i + 1;
@@ -44,9 +48,11 @@ end
 function out = performInitialTerminalStimulusTrial(inititalDuration, initialImage, terminalDuration, terminalImage, rewarded)
     showStimuli(initialImage, 2);
     out.initial = keyBuffer(inititalDuration);
+    out.initial = calculateResponses(out.initial);
     
     showStimuli(terminalImage, 2);
     out.terminal = keyBuffer(terminalDuration);
+    out.terminal = calculateResponses(out.terminal);
     
     if rewarded
         disp("food, yummi"); % TODO: real food plz

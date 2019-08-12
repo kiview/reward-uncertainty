@@ -29,13 +29,19 @@ if sessionNumber <= 8
         exp.pretraining.rewardColor, exp.pretraining.nonRewardColor, certainGroup);
     
     save2File(result);
-else
+elseif sessionNumber <= 12
     % pre 2
     result = pretrainingPhase2(exp.pretraining.phase2Trials, exp.pretraining.itiMin,...
         exp.pretraining.itiMax, exp.pretraining.initialDuration,...
         exp.pretraining.initialStimulus1, exp.pretraining.initialStimulus2,...
         exp.pretraining.terminalDuration, exp.pretraining.terminalStimulus1, exp.pretraining.terminalStimulus2, certainGroup);
     save2File(result);
+elseif sessionNumber <= 24
+    % training 1
+    
+else
+    % training 2
+    
 end
 
 
