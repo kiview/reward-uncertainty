@@ -36,23 +36,8 @@ for trial = trials
         keyOut = keyBuffer(stimulusDuration);
         out(i).rewarded = 0;
     end
-    % TODO: use calculateResponses()
-    
-    out(i).respPerTrial = size(keyOut.raw, 1);
-    
-    %% calc resp/s for each s
-    responseTimes = keyOut.rawData(:, 1);
-    offset = responseTimes(1);
-    correctedTimes = responseTimes - offset;
-    responsesForSeconds = floor(correctedTimes);
-    
-    highestValue = responsesForSeconds(end);
-    respPerSeconds = zeros(highestValue);
-    for n = 1:(highestValue + 1)
-        respPerSeconds(n) = sum(responsesForSeconds == n-1);
-    end
-    
-    out(i).respPerTrialPerSec = respPerSeconds;
+
+    out(i).terminal = calculateResponses(keyOut);
 
     i = i + 1;
 end
