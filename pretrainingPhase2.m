@@ -33,29 +33,29 @@ for trial = trials
     %% TL
     switch trial
         case 1
-            if inititalDuration2 && firstGroup
-                inititalDuration = inititalDuration2;
+            if initialDuration2 && firstGroup
+                inititalDuration = initialDuration2;
             end
             
-            out(i).response = performInitialTerminalStimulusTrial(inititalDuration, initialStimulus1, terminalDuration, terminalStimulus1, 1);
+            out(i).response = performInitialTerminalStimulusTrial(inititalDuration, initialStimulus1, terminalDuration, terminalStimulus1, 1, exp.feedingTime);
         case 2
-            if inititalDuration2 && ~firstGroup
-                inititalDuration = inititalDuration2;
+            if initialDuration2 && ~firstGroup
+                inititalDuration = initialDuration2;
             end
             
-            out(i).response = performInitialTerminalStimulusTrial(inititalDuration, initialStimulus2, terminalDuration, terminalStimulus1, 1);
+            out(i).response = performInitialTerminalStimulusTrial(inititalDuration, initialStimulus2, terminalDuration, terminalStimulus1, 1, exp.feedingTime);
         case 3
-            if inititalDuration2 && firstGroup
-                inititalDuration = inititalDuration2;
+            if initialDuration2 && firstGroup
+                inititalDuration = initialDuration2;
             end
             
-            out(i).response = performInitialTerminalStimulusTrial(inititalDuration, initialStimulus1, terminalDuration, terminalStimulus2, 0);
+            out(i).response = performInitialTerminalStimulusTrial(inititalDuration, initialStimulus1, terminalDuration, terminalStimulus2, 0, exp.feedingTime);
         case 4
-            if inititalDuration2 && ~firstGroup
-                inititalDuration = inititalDuration2;
+            if initialDuration2 && ~firstGroup
+                inititalDuration = initialDuration2;
             end
             
-            out(i).response = performInitialTerminalStimulusTrial(inititalDuration, initialStimulus2, terminalDuration, terminalStimulus2, 0);
+            out(i).response = performInitialTerminalStimulusTrial(inititalDuration, initialStimulus2, terminalDuration, terminalStimulus2, 0, exp.feedingTime);
     end
             
     i = i + 1;
@@ -65,7 +65,7 @@ showStimuli;
 
 end
 
-function out = performInitialTerminalStimulusTrial(inititalDuration, initialImage, terminalDuration, terminalImage, rewarded)
+function out = performInitialTerminalStimulusTrial(inititalDuration, initialImage, terminalDuration, terminalImage, rewarded, feedingTime)
     showStimuli(initialImage, 2);
     out.initial = keyBuffer(inititalDuration);
     out.initial = calculateResponses(out.initial);
@@ -74,11 +74,14 @@ function out = performInitialTerminalStimulusTrial(inititalDuration, initialImag
     out.terminal = keyBuffer(terminalDuration);
     out.terminal = calculateResponses(out.terminal);
     
+    out.cs = terminalImage;
+    
     if rewarded
-        feeding(exp.feedingTime);
+        feeding(feedingTime);
         out.rewarded = 1;
     else
         out.rewarded = 0;
     end
+    
 
 end

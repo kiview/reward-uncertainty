@@ -31,7 +31,7 @@ if sessionNumber <= 8
     result = pretrainingPhase1(exp.pretraining.phase1Trials, exp.pretraining.itiMin,...
         exp.pretraining.itiMax, exp.pretraining.stimulusDuration,...
         exp.pretraining.rewardColor, exp.pretraining.nonRewardColor, certainGroup);
-    
+    result = renderOutput(result);
     save2File(result);
 elseif sessionNumber <= 12
     % pre 2
@@ -40,6 +40,7 @@ elseif sessionNumber <= 12
         exp.pretraining.initialStimulus1, exp.pretraining.initialStimulus2,...
         exp.pretraining.terminalDuration, exp.pretraining.terminalStimulus1, exp.pretraining.terminalStimulus2,...
         certainGroup, [1], 0, 0);
+    result = renderOutput(result);
     save2File(result);
 elseif sessionNumber <= 24
     % training 1
@@ -48,6 +49,7 @@ elseif sessionNumber <= 24
         exp.pretraining.initialStimulus1, exp.pretraining.initialStimulus2,...
         exp.training.terminalDuration, exp.pretraining.terminalStimulus1, exp.pretraining.terminalStimulus2,...
         certainGroup, [0.125 0.125 0.375 0.375], 0, 0);
+    result = renderOutput(result);
     save2File(result);
 else
     % training 2
@@ -56,6 +58,7 @@ else
         exp.pretraining.initialStimulus1, exp.pretraining.initialStimulus2,...
         exp.training.terminalDuration, exp.pretraining.terminalStimulus1, exp.pretraining.terminalStimulus2,...
         certainGroup, [0.125 0.125 0.375 0.375], exp.training.initialDurationLong, firstHalf);
+    result = renderOutput(result);
     save2File(result);
 end
 
