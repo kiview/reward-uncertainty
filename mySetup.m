@@ -94,7 +94,7 @@ SETUP.io.punishment  = [];
 % key is connected). That means that the first response key could be
 % connected to pin 7 and the second response key to pin 3. That would
 % result in [7 3].
-SETUP.io.inputKeys     = [1 2 3];
+SETUP.io.inputKeys     = 1; % connect to 1 input pin
 % Add custom inputs here
 
 %% (5) Please specify monitor dimensions

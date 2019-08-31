@@ -15,6 +15,10 @@ function out = renderOutput(in)
         out(i).rewarded = trialResult.rewarded;
         out(i).cs = trialResult.cs.Filename;
         
+        if isfield(trialResult, 'csi')
+            out(i).csi = trialResult.csi.Filename;
+        end
+        
         out(i).t_respPerTrial = [trialResult.terminal.respPerTrial];
         out(i).t_respPerTrialPerSec = [trialResult.terminal.respPerTrialPerSec];
         

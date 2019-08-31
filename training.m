@@ -1,8 +1,10 @@
-function out = pretrainingPhase2(numTrials, minIti, maxIti, inititalDuration, ...
+function out = training(numTrials, minIti, maxIti, initialDuration, ...
     initialStimulus1, initialStimulus2, terminalDuration, terminalStimulus1, ...
     terminalStimulus2, certaintyGroup, ratio, initialDuration2, firstGroup)
 
 experimentalConditions;
+
+originalInitialDuration = initialDuration;
 
 %% Trial mapping
 % 1 -> i1 t1
@@ -11,7 +13,7 @@ experimentalConditions;
 % 4 -> i2 t2
 
 if certaintyGroup
-    trials = randomOrder(2, numTrials * 2);
+    trials = randomOrder(2, numTrials * 4);
 else
     trials = randomOrder(4, numTrials * 4, 'ratio', ratio);
 end
@@ -34,30 +36,30 @@ for trial = trials
     switch trial
         case 1
             if initialDuration2 && firstGroup
-                inititalDuration = initialDuration2;
+                initialDuration = initialDuration2;
             end
             
-            out(i).response = performInitialTerminalStimulusTrial(inititalDuration, initialStimulus1, terminalDuration, terminalStimulus1, 1, exp.feedingTime);
+            out(i).response = performInitialTerminalStimulusTrial(initialDuration, initialStimulus1, terminalDuration, terminalStimulus1, 1, exp.feedingTime);
         case 2
             if initialDuration2 && ~firstGroup
-                inititalDuration = initialDuration2;
+                initialDuration = initialDuration2;
             end
             
-            out(i).response = performInitialTerminalStimulusTrial(inititalDuration, initialStimulus2, terminalDuration, terminalStimulus1, 1, exp.feedingTime);
+            out(i).response = performInitialTerminalStimulusTrial(initialDuration, initialStimulus2, terminalDuration, terminalStimulus1, 1, exp.feedingTime);
         case 3
             if initialDuration2 && firstGroup
-                inititalDuration = initialDuration2;
+                initialDuration = initialDuration2;
             end
             
-            out(i).response = performInitialTerminalStimulusTrial(inititalDuration, initialStimulus1, terminalDuration, terminalStimulus2, 0, exp.feedingTime);
+            out(i).response = performInitialTerminalStimulusTrial(initialDuration, initialStimulus1, terminalDuration, terminalStimulus2, 0, exp.feedingTime);
         case 4
             if initialDuration2 && ~firstGroup
-                inititalDuration = initialDuration2;
+                initialDuration = initialDuration2;
             end
             
-            out(i).response = performInitialTerminalStimulusTrial(inititalDuration, initialStimulus2, terminalDuration, terminalStimulus2, 0, exp.feedingTime);
+            out(i).response = performInitialTerminalStimulusTrial(initialDuration, initialStimulus2, terminalDuration, terminalStimulus2, 0, exp.feedingTime);
     end
-            
+    initialDuration = originalInitialDuration;
     i = i + 1;
 end
 
@@ -69,6 +71,8 @@ function out = performInitialTerminalStimulusTrial(inititalDuration, initialImag
     showStimuli(initialImage, 2);
     out.initial = keyBuffer(inititalDuration);
     out.initial = calculateResponses(out.initial);
+    
+    out.csi = initialImage;
     
     showStimuli(terminalImage, 2);
     out.terminal = keyBuffer(terminalDuration);

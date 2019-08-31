@@ -11,7 +11,7 @@ Configuration of the actual experiment is done in `experimentalConditions.m`
 Run the Software
 ----------------
 
-The software is started via the `pretraining.m` script.
+The software is started via the `runExperiment.m` script.
 
 License
 -------
